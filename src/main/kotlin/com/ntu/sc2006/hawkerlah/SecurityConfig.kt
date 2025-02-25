@@ -14,8 +14,10 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .requiresChannel{channel ->
-            channel.anyRequest().requiresSecure()}
+            .requiresChannel{
+                    channel ->
+                channel.anyRequest().requiresSecure()
+            }
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/customer/**").authenticated()

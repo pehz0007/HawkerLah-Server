@@ -34,6 +34,20 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")
 	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+	implementation("org.reactivestreams:reactive-streams:1.0.4")
+	implementation("io.projectreactor:reactor-core:3.7.3")
+	runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.10.1")
+
+	val ktorVersion = "3.1.0"
+
+	implementation("io.ktor:ktor-client-apache5:$ktorVersion")
+
+	val supabaseVersion = "3.1.1"
+
+	implementation("io.github.jan-tennert.supabase:auth-kt:$supabaseVersion")
+	implementation("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
+	implementation("io.github.jan-tennert.supabase:realtime-kt:$supabaseVersion")
+
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
