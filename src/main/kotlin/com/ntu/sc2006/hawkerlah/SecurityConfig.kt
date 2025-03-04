@@ -20,6 +20,8 @@ class SecurityConfig {
             }
             .csrf { it.disable() }
             .authorizeHttpRequests {
+                it.requestMatchers("/public/**").permitAll()
+                it.requestMatchers("/common/**").authenticated()
                 it.requestMatchers("/customer/**").authenticated()
                 it.requestMatchers("/hawker-owners/**").authenticated()
             }

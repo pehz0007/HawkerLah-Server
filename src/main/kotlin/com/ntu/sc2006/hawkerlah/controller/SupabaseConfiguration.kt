@@ -2,6 +2,7 @@ package com.ntu.sc2006.hawkerlah.controller
 
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -42,6 +43,10 @@ class SupabaseBean(
     ) {
 
         install(Postgrest) {
+        }
+
+        install(Storage) {
+
         }
     }
 }

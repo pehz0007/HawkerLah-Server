@@ -47,6 +47,7 @@ dependencies {
 	implementation("io.github.jan-tennert.supabase:auth-kt:$supabaseVersion")
 	implementation("io.github.jan-tennert.supabase:postgrest-kt:$supabaseVersion")
 	implementation("io.github.jan-tennert.supabase:realtime-kt:$supabaseVersion")
+	implementation("io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
