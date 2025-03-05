@@ -34,6 +34,18 @@ class CommonService(
         }
     }
 
+    suspend fun setHasProfileImage(userId: String, value: Boolean) {
+        val client = supabaseBean.supabaseClient()
+        client
+            .from("profiles")
+            .update(mapOf("has_profile_image" to value)){
+                filter {
+                    eq("id", userId)
+                }
+            }
+    }
+
+
 
 
 }

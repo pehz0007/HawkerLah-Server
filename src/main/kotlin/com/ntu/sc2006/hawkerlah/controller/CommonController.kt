@@ -21,8 +21,11 @@ class CommonController(
     suspend fun updateProfileImage(@RequestParam("file") file: MultipartFile, authentication: Authentication): ResponseEntity<String> {
         return try {
             val imageBytes = file.bytes
-            val username = authentication.name
-            commonService.updateProfileImage(imageBytes, username)
+            val userId = authentication.name
+            commonService.updateProfileImage(imageBytes, userId)
+
+            commonService.setHasProfileImage(userId, true)
+
             ResponseEntity.ok("Profile image updated successfully")
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
