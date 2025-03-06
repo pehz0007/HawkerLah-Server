@@ -22,10 +22,7 @@ class CommonController(
         return try {
             val imageBytes = file.bytes
             val userId = authentication.name
-            commonService.updateProfileImage(imageBytes, userId)
-
-            commonService.setHasProfileImage(userId, true)
-
+            commonService.updateProfileImage(userId, imageBytes, userId)
             ResponseEntity.ok("Profile image updated successfully")
         } catch (e: Exception) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

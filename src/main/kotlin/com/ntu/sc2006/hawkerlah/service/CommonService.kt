@@ -11,7 +11,7 @@ class CommonService(
     val supabaseBean: SupabaseBean
 ) {
 
-    suspend fun updateProfileImage(imageBytes: ByteArray, fileName: String): String {
+    suspend fun updateProfileImage(userId: String, imageBytes: ByteArray, fileName: String): String {
         val client = supabaseBean.supabaseClient()
 
         return try {
@@ -27,6 +27,7 @@ class CommonService(
 
             val publicUrl = client.storage.from(bucketName).publicUrl(filePath)
             println("Image uploaded successfully: $publicUrl")
+            setProfileImageUrl(userId, publicUrl)
             publicUrl
         } catch (e: Exception) {
             println("Failed to upload image: ${e.message}")
@@ -34,11 +35,11 @@ class CommonService(
         }
     }
 
-    suspend fun setHasProfileImage(userId: String, value: Boolean) {
+    suspend fun setProfileImageUrl(userId: String, url: String) {
         val client = supabaseBean.supabaseClient()
         client
             .from("profiles")
-            .update(mapOf("has_profile_image" to value)){
+            .update(mapOf("profile_image_url" to url)){
                 filter {
                     eq("id", userId)
                 }
