@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
 	kotlin("jvm") version "2.1.0"
 	kotlin("plugin.serialization") version "2.1.0"
@@ -60,6 +62,12 @@ dependencies {
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
+	}
+}
+
+tasks.withType<KotlinCompile> {
+	compilerOptions {
+        freeCompilerArgs.addAll(listOf("-opt-in=kotlin.uuid.ExperimentalUuidApi"))
 	}
 }
 

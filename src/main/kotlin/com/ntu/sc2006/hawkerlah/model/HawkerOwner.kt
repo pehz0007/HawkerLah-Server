@@ -5,12 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class HawkerStall(
+data class HawkerOwner(
     val id: SUUID,
-    val name: String,
-    @SerialName("image_url")
-    val imageUrl: String?,
     @SerialName("hawker_centre_id")
     val hawkerCentreId: SUUID,
-    val rating: Float,
 )

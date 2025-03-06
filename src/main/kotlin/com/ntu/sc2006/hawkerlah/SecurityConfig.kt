@@ -23,7 +23,7 @@ class SecurityConfig {
                 it.requestMatchers("/public/**").permitAll()
                 it.requestMatchers("/common/**").authenticated()
                 it.requestMatchers("/customer/**").authenticated()
-                it.requestMatchers("/hawker-owners/**").authenticated()
+                it.requestMatchers("/hawker-owner/**").authenticated()
             }
             .oauth2ResourceServer { oauth2 -> oauth2.jwt { } }
             .sessionManagement { session ->

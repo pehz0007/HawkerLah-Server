@@ -8,5 +8,4 @@ data class Hawker(
     @SerialName("hawker_email") override val email: String, // Distinct name if needed
     @SerialName("hawker_username") override val username: String,
     @SerialName("hawker_number") override val number: String,
-    val hawkerStall: HawkerStall
 ) : User(email, username, number)
