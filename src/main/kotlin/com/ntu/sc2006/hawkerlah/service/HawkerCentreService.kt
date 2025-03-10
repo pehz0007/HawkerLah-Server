@@ -3,11 +3,9 @@ package com.ntu.sc2006.hawkerlah.service
 import com.ntu.sc2006.hawkerlah.controller.SupabaseBean
 import com.ntu.sc2006.hawkerlah.model.Food
 import com.ntu.sc2006.hawkerlah.model.HawkerCentre
-import com.ntu.sc2006.hawkerlah.model.HawkerOwner
 import com.ntu.sc2006.hawkerlah.model.HawkerStall
 import com.ntu.sc2006.hawkerlah.utils.SUUID
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.springframework.stereotype.Service
@@ -61,7 +59,7 @@ class HawkerCentreService(
                     filter {
                         eq("id", dishID)
                     }
-                }.decodeSingle<Food>()
+                }
 
             println("Updated Dish: $response")
         } catch (e: Exception) {
