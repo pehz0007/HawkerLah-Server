@@ -4,8 +4,12 @@ import com.ntu.sc2006.hawkerlah.controller.SupabaseBean
 import com.ntu.sc2006.hawkerlah.model.Food
 import com.ntu.sc2006.hawkerlah.model.HawkerCentre
 import com.ntu.sc2006.hawkerlah.model.HawkerStall
+import com.ntu.sc2006.hawkerlah.model.OrderTracking
 import com.ntu.sc2006.hawkerlah.utils.SUUID
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.datetime.LocalDate
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.springframework.stereotype.Service
@@ -47,14 +51,20 @@ class HawkerCentreService(
             }
         }.decodeList<Food>()
     }
+
     suspend fun retrieveAllHawkerCentreFoodItems(hawkerCentreId: String): List<Food> {
         val client = supabaseBean.supabaseClient()
         return try {
-            client.from("stall_dishes").select() {
+            client.from("hawker_stall").select(Columns.raw(
+                """
+                *,
+                stall_dishes(*)
+                """
+            )) {
                 filter {
-                    eq("hawker_centre_id", hawkerCentreId) // Filter by Hawker Centre ID
+                    eq("hawker_centre_id", hawkerCentreId)
                 }
-            }.decodeList<Food>() // Decode result into a list of Food objects
+            }.decodeList<HawkerStall>().flatMap { it.stallDishes!! }
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList() // Return an empty list in case of error
@@ -62,6 +72,18 @@ class HawkerCentreService(
     }
 
     //kcEnd
+
+    suspend fun retrieveOrderTracking(hawkerId: SUUID, saleDate: LocalDate): List<OrderTracking> {
+        val menuItems = retrieveHawkerStallDishes(hawkerId)
+        val client = supabaseBean.supabaseClient()
+        return client.from("hawker_sales").select() {
+            filter {
+
+                contains("stall_dish_id", menuItems.map { it.id })
+                eq("sales_date", saleDate)
+            }
+        }.decodeList<OrderTracking>()
+    }
 
 
     suspend fun updateDishDetails(

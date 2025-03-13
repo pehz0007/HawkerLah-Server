@@ -13,4 +13,6 @@ data class HawkerStall(
     @SerialName("hawker_centre_id")
     val hawkerCentreId: SUUID,
     val rating: Float,
+    @SerialName("stall_dishes")
+    val stallDishes: List<Food>? = emptyList()
 )
