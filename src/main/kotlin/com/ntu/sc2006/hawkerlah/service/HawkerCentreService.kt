@@ -38,6 +38,18 @@ class HawkerCentreService(
         }.decodeSingle<Food>()
     }
 
+    //kcADD
+    suspend fun retrieveHawkerStallDishes(hawkerId: SUUID): List<Food> {
+        val client = supabaseBean.supabaseClient()
+        return client.from("stall_dishes").select() {
+            filter {
+                eq("hawker_id", hawkerId)
+            }
+        }.decodeList<Food>()
+    }
+    //kcEnd
+
+
     suspend fun updateDishDetails(
         dishID: SUUID,
         dishName: String,
