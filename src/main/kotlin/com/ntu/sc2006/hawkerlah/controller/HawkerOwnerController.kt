@@ -1,8 +1,11 @@
 package com.ntu.sc2006.hawkerlah.controller
 
 import com.ntu.sc2006.hawkerlah.service.HawkerCentreService
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -79,13 +82,17 @@ class HawkerOwnerController(
 
 
     @GetMapping("/order-tracking")
-    suspend fun getOrderTracking(authentication: Authentication){
+    suspend fun getOrderTracking(authentication: Authentication): ResponseEntity<String> {
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         val userId = Uuid.parse(authentication.name)
         val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
-        val menuItems = hawkerCentreService.retrieveHawkerStallDishes(hawkerStall.id)
-
-        //
-
+        var menuItems = hawkerCentreService.retrieveHawkerStallDishesWithOrderTracking(hawkerStall.id, today)
+        menuItems.flatMap { it.orderTrackings!! }.ifEmpty {
+            menuItems.forEach { hawkerCentreService.createOrderTracking(it.id, today) }
+            menuItems = hawkerCentreService.retrieveHawkerStallDishesWithOrderTracking(hawkerStall.id, today)
+        }
+        val jsonResponse = Json.encodeToString(menuItems)
+        return ResponseEntity.ok(jsonResponse)
     }
 
 

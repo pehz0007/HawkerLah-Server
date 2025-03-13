@@ -15,13 +15,15 @@ data class Food(
     @SerialName("image_url")
     val image: String,
     @SerialName("dish_name")
-    val name: String,
+    val dishName: String,
     val description: String,
     val price: Double,
     @SerialName("clearance_price")
     val clearancePrice: Double,
 //    val status: FoodStatus,
     @SerialName("hawker_id")
-    val hawkerStallId: SUUID
+    val hawkerStallId: SUUID,
+    @SerialName("hawker_sales")
+    val orderTrackings: List<OrderTracking>? = emptyList()
 )
 
