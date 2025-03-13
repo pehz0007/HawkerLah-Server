@@ -8,11 +8,13 @@ import com.ntu.sc2006.hawkerlah.model.OrderTracking
 import com.ntu.sc2006.hawkerlah.utils.SUUID
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.json.JsonArray
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.springframework.stereotype.Service
+import kotlin.uuid.Uuid
 
 @Service
 class HawkerCentreService(
@@ -73,16 +75,24 @@ class HawkerCentreService(
 
     //kcEnd
 
-    suspend fun retrieveOrderTracking(hawkerId: SUUID, saleDate: LocalDate): List<OrderTracking> {
-        val menuItems = retrieveHawkerStallDishes(hawkerId)
+    suspend fun retrieveHawkerStallDishesWithOrderTracking(hawkerId: SUUID, saleDate: LocalDate): List<Food> {
         val client = supabaseBean.supabaseClient()
-        return client.from("hawker_sales").select() {
-            filter {
-
-                contains("stall_dish_id", menuItems.map { it.id })
-                eq("sales_date", saleDate)
-            }
-        }.decodeList<OrderTracking>()
+        return try {
+            client.from("stall_dishes").select(Columns.raw(
+                """
+                *,
+                hawker_sales(*)
+            """
+            )) {
+                filter {
+                    eq("hawker_id", hawkerId)
+                    eq("hawker_sales.sales_date", saleDate.toString())
+                }
+            }.decodeList<Food>()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList() // Return an empty list in case of error
+        }
     }
 
 
@@ -115,6 +125,16 @@ class HawkerCentreService(
             println("Error updating dish: ${e.message}")
         }
 
+    }
+
+    suspend fun createOrderTracking(dishId: SUUID, saleDate: LocalDate) {
+        val client = supabaseBean.supabaseClient()
+        client.from("hawker_sales").insert(OrderTracking(
+            id = Uuid.random(),
+            quantity = 0,
+            salesDate = saleDate,
+            stallDishId = dishId,
+        ))
     }
 
 }
