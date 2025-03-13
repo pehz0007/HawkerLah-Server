@@ -18,4 +18,5 @@ class PublicController(
         val responseJson = Json.encodeToString(hawkerCentreService.retrieveHawkerCentres())
         return ResponseEntity.ok(responseJson)
     }
+
 }
