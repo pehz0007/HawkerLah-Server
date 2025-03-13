@@ -47,6 +47,20 @@ class HawkerCentreService(
             }
         }.decodeList<Food>()
     }
+    suspend fun retrieveAllHawkerCentreFoodItems(hawkerCentreId: String): List<Food> {
+        val client = supabaseBean.supabaseClient()
+        return try {
+            client.from("stall_dishes").select() {
+                filter {
+                    eq("hawker_centre_id", hawkerCentreId) // Filter by Hawker Centre ID
+                }
+            }.decodeList<Food>() // Decode result into a list of Food objects
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList() // Return an empty list in case of error
+        }
+    }
+
     //kcEnd
 
 

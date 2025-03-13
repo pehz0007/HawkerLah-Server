@@ -22,20 +22,17 @@ class CustomerController(
         val responseJson = Json.encodeToString(hawkerCentreService.retrieveHawkerCentres())
         return ResponseEntity.ok(responseJson)
     }
+    @GetMapping("/hawker-centre-food")
+    suspend fun getAllMenuFromSpecificHawkerCentre(@RequestParam hawkerCentreId:SUUID): ResponseEntity<String> {
+        val responseJson = Json.encodeToString(hawkerCentreService.retrieveAllHawkerCentreFoodItems(hawkerCentreId.toString()))
+        return ResponseEntity.ok(responseJson)
+
+    }
 
     @GetMapping("/carpark")
     suspend fun getCarParkerCentres(): ResponseEntity<String> {
         val responseJson = Json.encodeToString(carparkService.fetchCarparkGeoJson())
         return ResponseEntity.ok(responseJson)
     }
-
-//
-//
-//    @PostMapping("/requestAddDish", consumes = ["application/json"])
-//    fun requestAddDish(@RequestBody food: Food): ResponseEntity<String> {
-//        val responseJson = Json.encodeToString(food)
-//
-//        return ResponseEntity.ok("Received Dish Data: $responseJson")
-//    }
 
 }
