@@ -31,6 +31,38 @@ class HawkerOwnerController(
         return ResponseEntity.ok(responseJson)
     }
 
+//    @PutMapping("/hawker-dish-update")
+//    suspend fun updateDishDetails(@RequestBody updatedDish: UpdateDishRequest): ResponseEntity<String> {
+//        return try {
+//            val dishId = Uuid.parse(updatedDish.dishId)
+//            hawkerCentreService.updateDishDetails(
+//                dishId, updatedDish.dishName, updatedDish.description, updatedDish.price, updatedDish.clearancePrice
+//            )
+//            ResponseEntity.ok("Dish updated successfully")
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating dish ${e.message}")
+//        }
+//    }
+
+    data class UpdateDishRequest(
+        val dishId: String,
+        val dishName: String,
+        val description: String,
+        val price: Double,
+        val clearancePrice: Double
+    )
+
+    //KCadd
+    @GetMapping("/hawker-menu")
+    suspend fun getHawkerMenu(authentication: Authentication): ResponseEntity<String> {
+        val userId = Uuid.parse(authentication.name)
+        val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
+        val menuItems = hawkerCentreService.retrieveHawkerStallDishes(hawkerStall.id)
+        val responseJson = Json.encodeToString(menuItems)
+        return ResponseEntity.ok(responseJson)
+    }
+
     @PutMapping("/hawker-dish-update")
     suspend fun updateDishDetails(@RequestBody updatedDish: UpdateDishRequest): ResponseEntity<String> {
         return try {
@@ -45,13 +77,6 @@ class HawkerOwnerController(
         }
     }
 
-    data class UpdateDishRequest(
-        val dishId: String,
-        val dishName: String,
-        val description: String,
-        val price: Double,
-        val clearancePrice: Double
-    )
-
+    //KCend
 
 }
