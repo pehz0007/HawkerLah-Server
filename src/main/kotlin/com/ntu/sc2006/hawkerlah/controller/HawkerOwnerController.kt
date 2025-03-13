@@ -77,6 +77,16 @@ class HawkerOwnerController(
         }
     }
 
-    //KCend
+
+    @GetMapping("/order-tracking")
+    suspend fun getOrderTracking(authentication: Authentication){
+        val userId = Uuid.parse(authentication.name)
+        val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
+        val menuItems = hawkerCentreService.retrieveHawkerStallDishes(hawkerStall.id)
+
+        //
+
+    }
+
 
 }

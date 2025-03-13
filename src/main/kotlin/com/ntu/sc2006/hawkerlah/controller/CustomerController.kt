@@ -23,7 +23,7 @@ class CustomerController(
         return ResponseEntity.ok(responseJson)
     }
     @GetMapping("/hawker-centre-food")
-    suspend fun getAllMenuFromSpecificHawkerCentre(@RequestParam hawkerCentreId:SUUID): ResponseEntity<String> {
+    suspend fun getAllMenuFromSpecificHawkerCentre(@RequestParam hawkerCentreId: String): ResponseEntity<String> {
         val responseJson = Json.encodeToString(hawkerCentreService.retrieveAllHawkerCentreFoodItems(hawkerCentreId.toString()))
         return ResponseEntity.ok(responseJson)
 

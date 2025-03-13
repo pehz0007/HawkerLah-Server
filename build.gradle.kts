@@ -51,6 +51,8 @@ dependencies {
 	implementation("io.github.jan-tennert.supabase:realtime-kt:$supabaseVersion")
 	implementation("io.github.jan-tennert.supabase:storage-kt:$supabaseVersion")
 
+	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
