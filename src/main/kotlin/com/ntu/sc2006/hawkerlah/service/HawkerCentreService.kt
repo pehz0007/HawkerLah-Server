@@ -8,10 +8,9 @@ import com.ntu.sc2006.hawkerlah.model.OrderTracking
 import com.ntu.sc2006.hawkerlah.utils.SUUID
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.storage
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.springframework.stereotype.Service
@@ -170,14 +169,49 @@ class HawkerCentreService(
 
     }
 
-    suspend fun createOrderTracking(dishId: SUUID, saleDate: LocalDate) {
+    suspend fun createOrderTracking(dishId: SUUID, salesDate: LocalDate) {
         val client = supabaseBean.supabaseClient()
         client.from("hawker_sales").insert(OrderTracking(
             id = Uuid.random(),
             quantity = 0,
-            salesDate = saleDate,
+            salesDate = salesDate,
             stallDishId = dishId,
         ))
+    }
+
+    suspend fun getDishOrderTracking(dishId: SUUID, hawkerId: SUUID, salesDate: LocalDate): Food? {
+        val client = supabaseBean.supabaseClient()
+        return try {
+            client.from("stall_dishes").select(
+                Columns.raw(
+                    """
+                hawker_sales(*),
+                *
+                """
+                )
+            ) {
+                filter {
+                    eq("hawker_id", hawkerId)
+                    eq("hawker_sales.stall_dish_id", dishId)
+                    eq("hawker_sales.sales_date", salesDate)
+                }
+            }.decodeList<Food>().firstOrNull { it.orderTrackings!!.isNotEmpty() }
+        } catch (e: Exception) {
+            println("Failed to add dish: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun updateOrderTrackingQuantity(dishId: SUUID, salesDate: LocalDate, quantity: Long) {
+        val client = supabaseBean.supabaseClient()
+        client.from("hawker_sales").update({
+            OrderTracking::quantity setTo quantity
+        }) {
+            filter {
+                eq("stall_dish_id", dishId)
+                eq("sales_date", salesDate)
+            }
+        }
     }
 
 }

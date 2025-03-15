@@ -1,11 +1,16 @@
 package com.ntu.sc2006.hawkerlah.controller
 
+import com.ntu.sc2006.hawkerlah.service.ErrorResult
 import com.ntu.sc2006.hawkerlah.service.HawkerCentreService
+import com.ntu.sc2006.hawkerlah.service.Result
+import com.ntu.sc2006.hawkerlah.service.SuccessResult
+import com.ntu.sc2006.hawkerlah.service.toResponseEntity
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -105,13 +110,31 @@ class HawkerOwnerController(
         val userId = Uuid.parse(authentication.name)
         val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
         var menuItems = hawkerCentreService.retrieveHawkerStallDishesWithOrderTracking(hawkerStall.id, today)
-        menuItems.flatMap { it.orderTrackings!! }.ifEmpty {
-            menuItems.forEach { hawkerCentreService.createOrderTracking(it.id, today) }
-            menuItems = hawkerCentreService.retrieveHawkerStallDishesWithOrderTracking(hawkerStall.id, today)
+        menuItems.filter { it.orderTrackings!!.isEmpty() }.forEach {
+            hawkerCentreService.createOrderTracking(it.id, today)
         }
+        //Create missing order tracking for today
+        menuItems = hawkerCentreService.retrieveHawkerStallDishesWithOrderTracking(hawkerStall.id, today)
         val jsonResponse = Json.encodeToString(menuItems)
         return ResponseEntity.ok(jsonResponse)
     }
+
+    @GetMapping("/order-tracking-increment")
+    suspend fun incrementOrderTracking(authentication: Authentication, @RequestParam dishId: String): ResponseEntity<String> {
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val userId = Uuid.parse(authentication.name)
+        val dishId = Uuid.parse(dishId)
+        val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
+        val dish = hawkerCentreService.getDishOrderTracking(dishId, hawkerStall.id, today)
+        return if(dish != null) {
+            hawkerCentreService.updateOrderTrackingQuantity(dish.id, today, dish.orderTrackings!!.first().quantity + 1)
+            val updatedDish = hawkerCentreService.getDishOrderTracking(dishId, hawkerStall.id, today)
+            SuccessResult(updatedDish).toResponseEntity()
+        }else {
+            ErrorResult<String>("Order Tracking does not exist!").toResponseEntity()
+        }
+    }
+
 
 
 }
