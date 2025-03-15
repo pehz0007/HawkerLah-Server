@@ -8,12 +8,14 @@ import com.ntu.sc2006.hawkerlah.model.OrderTracking
 import com.ntu.sc2006.hawkerlah.utils.SUUID
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.storage
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.springframework.stereotype.Service
+import kotlin.random.Random
 import kotlin.uuid.Uuid
 
 @Service
@@ -95,6 +97,47 @@ class HawkerCentreService(
         }
     }
 
+    suspend fun addNewDish(
+        hawkerId: String,
+        dishName: String,
+        description: String,
+        price: Double,
+        clearancePrice: Double,
+        imgBytes: ByteArray
+    ) {
+        try {
+            val client = supabaseBean.supabaseClient()
+            val bucketName = "dish-photos"
+            val randomNo = Random.nextInt(1, 99)
+            val filePath = "users/${hawkerId}_${randomNo}.jpg"
+
+            client.storage.from(bucketName).upload(
+                path = filePath,
+                data = imgBytes,
+            ) {
+                upsert = true
+            }
+
+            val imageUrl = client.storage.from(bucketName).publicUrl(filePath)
+            println("Image uploaded successfully: $imageUrl")
+
+            val response = client.from("stall_dishes")
+                .insert(buildJsonObject {
+                    put("dish_name", dishName)
+                    put("description", description)
+                    put("price", price)
+                    put("clearance_price", clearancePrice)
+                    put("hawker_id", hawkerId)
+                    put("image_url", imageUrl)
+                })
+
+            println("Added Dish: $response")
+
+        } catch (e: Exception) {
+            println("Failed to add dish: ${e.message}")
+            throw e
+        }
+    }
 
     suspend fun updateDishDetails(
         dishID: SUUID,
