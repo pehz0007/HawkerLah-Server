@@ -3,12 +3,11 @@ package com.ntu.sc2006.hawkerlah.service
 import com.ntu.sc2006.hawkerlah.controller.SupabaseBean
 import com.ntu.sc2006.hawkerlah.model.Food
 import com.ntu.sc2006.hawkerlah.model.HawkerCentre
+import com.ntu.sc2006.hawkerlah.model.HawkerSales
 import com.ntu.sc2006.hawkerlah.model.HawkerStall
-import com.ntu.sc2006.hawkerlah.model.OrderTracking
 import com.ntu.sc2006.hawkerlah.utils.SUUID
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
-import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.storage
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.buildJsonObject
@@ -76,7 +75,7 @@ class HawkerCentreService(
 
     //kcEnd
 
-    suspend fun retrieveHawkerStallDishesWithOrderTracking(hawkerId: SUUID, saleDate: LocalDate): List<Food> {
+    suspend fun retrieveHawkerStallDishesWithHawkerSales(hawkerId: SUUID, saleDate: LocalDate): List<Food> {
         val client = supabaseBean.supabaseClient()
         return try {
             client.from("stall_dishes").select(Columns.raw(
@@ -169,9 +168,9 @@ class HawkerCentreService(
 
     }
 
-    suspend fun createOrderTracking(dishId: SUUID, salesDate: LocalDate) {
+    suspend fun createHawkerSales(dishId: SUUID, salesDate: LocalDate) {
         val client = supabaseBean.supabaseClient()
-        client.from("hawker_sales").insert(OrderTracking(
+        client.from("hawker_sales").insert(HawkerSales(
             id = Uuid.random(),
             quantity = 0,
             salesDate = salesDate,
@@ -179,7 +178,7 @@ class HawkerCentreService(
         ))
     }
 
-    suspend fun getDishOrderTracking(dishId: SUUID, hawkerId: SUUID, salesDate: LocalDate): Food? {
+    suspend fun getDishHawkerSales(dishId: SUUID, hawkerId: SUUID, salesDate: LocalDate): Food? {
         val client = supabaseBean.supabaseClient()
         return try {
             client.from("stall_dishes").select(
@@ -195,17 +194,17 @@ class HawkerCentreService(
                     eq("hawker_sales.stall_dish_id", dishId)
                     eq("hawker_sales.sales_date", salesDate)
                 }
-            }.decodeList<Food>().firstOrNull { it.orderTrackings!!.isNotEmpty() }
+            }.decodeList<Food>().firstOrNull { it.hawkerSales!!.isNotEmpty() }
         } catch (e: Exception) {
             println("Failed to add dish: ${e.message}")
             throw e
         }
     }
 
-    suspend fun updateOrderTrackingQuantity(dishId: SUUID, salesDate: LocalDate, quantity: Long) {
+    suspend fun updateHawkerSalesQuantity(dishId: SUUID, salesDate: LocalDate, quantity: Long) {
         val client = supabaseBean.supabaseClient()
         client.from("hawker_sales").update({
-            OrderTracking::quantity setTo quantity
+            HawkerSales::quantity setTo quantity
         }) {
             filter {
                 eq("stall_dish_id", dishId)
