@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 data class Carpark(
     val name: String,
     val type: String,
-    val totalLots: Int,
-    val availableLots: Int,
+    val address: String,
+    val totalLots: String,
+    val availableLots: String,
     val location: Location
 )
