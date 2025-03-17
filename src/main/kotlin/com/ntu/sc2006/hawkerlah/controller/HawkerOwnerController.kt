@@ -1,11 +1,13 @@
 package com.ntu.sc2006.hawkerlah.controller
 
 import com.ntu.sc2006.hawkerlah.model.OrderTracking
+import com.ntu.sc2006.hawkerlah.model.SalesData
 import com.ntu.sc2006.hawkerlah.service.ErrorResult
 import com.ntu.sc2006.hawkerlah.service.HawkerCentreService
 import com.ntu.sc2006.hawkerlah.service.SuccessResult
 import com.ntu.sc2006.hawkerlah.service.toResponseEntity
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.encodeToString
@@ -150,6 +152,16 @@ class HawkerOwnerController(
         }else {
             ErrorResult<String>("Order Tracking does not exist!").toResponseEntity()
         }
+    }
+
+    @GetMapping("/past-sales")
+    suspend fun getPastSales(authentication: Authentication, @RequestParam("startDate") startDateStr: String, @RequestParam("endDate") endDateStr: String): ResponseEntity<String> {
+        val userId = Uuid.parse(authentication.name)
+        val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
+        val startDate = LocalDate.parse(startDateStr)
+        val endDate = LocalDate.parse(endDateStr)
+        val hawkerSales = hawkerCentreService.getPastSales(hawkerStall.id, startDate, endDate)
+        return SuccessResult(SalesData(hawkerSales)).toResponseEntity()
     }
 
 }

@@ -12,5 +12,7 @@ data class HawkerSales(
     @SerialName("sales_date")
     val salesDate: LocalDate,
     @SerialName("stall_dish_id")
-    val stallDishId: SUUID
+    val stallDishId: SUUID,
+    @SerialName("stall_dishes")
+    val stallDishes: Food? = null
 )

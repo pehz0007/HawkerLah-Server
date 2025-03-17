@@ -190,9 +190,11 @@ class HawkerCentreService(
                 )
             ) {
                 filter {
-                    eq("hawker_id", hawkerId)
-                    eq("hawker_sales.stall_dish_id", dishId)
-                    eq("hawker_sales.sales_date", salesDate)
+                    and {
+                        eq("hawker_id", hawkerId)
+                        eq("hawker_sales.stall_dish_id", dishId)
+                        eq("hawker_sales.sales_date", salesDate)
+                    }
                 }
             }.decodeList<Food>().firstOrNull { it.hawkerSales!!.isNotEmpty() }
         } catch (e: Exception) {
@@ -212,5 +214,24 @@ class HawkerCentreService(
             }
         }
     }
+
+    suspend fun getPastSales(hawkerId: SUUID, startDate: LocalDate, endDate: LocalDate): List<HawkerSales> {
+        val client = supabaseBean.supabaseClient()
+        return client.from("hawker_sales").select(
+            Columns.raw("""
+                stall_dishes(*),
+                *
+            """.trimIndent())
+        ) {
+            filter {
+                eq("stall_dishes.hawker_id", hawkerId)
+                and {
+                    gte("sales_date", startDate)
+                    lte("sales_date", endDate)
+                }
+            }
+        }.decodeList<HawkerSales>().filter { it.stallDishes != null }
+    }
+
 
 }
