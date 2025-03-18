@@ -190,11 +190,9 @@ class HawkerCentreService(
                 )
             ) {
                 filter {
-                    and {
-                        eq("hawker_id", hawkerId)
-                        eq("hawker_sales.stall_dish_id", dishId)
-                        eq("hawker_sales.sales_date", salesDate)
-                    }
+                    eq("hawker_id", hawkerId)
+                    eq("hawker_sales.stall_dish_id", dishId)
+                    eq("hawker_sales.sales_date", salesDate)
                 }
             }.decodeList<Food>().firstOrNull { it.hawkerSales!!.isNotEmpty() }
         } catch (e: Exception) {
