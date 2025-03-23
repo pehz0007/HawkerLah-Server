@@ -4,10 +4,7 @@ import com.ntu.sc2006.hawkerlah.utils.SUUID
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
-enum class FoodStatus {
-    SELLING_FAST, CLEARANCE, NORMAL
-}
+
 
 @Serializable
 data class Food(
@@ -26,10 +23,6 @@ data class Food(
     @SerialName("hawker_sales")
     val hawkerSales: List<HawkerSales>? = emptyList(),
     // KC ADD
-    @SerialName("cold_food")
-    val coldFood: Boolean,
-    @SerialName("clearance")
-    val clearance: Boolean
 
 )
 
