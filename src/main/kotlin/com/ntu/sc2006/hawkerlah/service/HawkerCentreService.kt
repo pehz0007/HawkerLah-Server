@@ -59,9 +59,12 @@ class HawkerCentreService(
         return try {
             client.from("hawker_stall").select(Columns.raw(
                 """
-                *,
-                stall_dishes(*)
-                """
+            *,
+            stall_dishes(
+                id, dish_name, description, price, clearance_price, image_url, hawker_id, 
+                cold_food, clearance
+            )
+            """
             )) {
                 filter {
                     eq("hawker_centre_id", hawkerCentreId)

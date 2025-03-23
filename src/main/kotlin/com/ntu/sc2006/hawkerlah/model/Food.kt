@@ -24,6 +24,6 @@ data class Food(
     @SerialName("hawker_id")
     val hawkerStallId: SUUID,
     @SerialName("hawker_sales")
-    val hawkerSales: List<HawkerSales>? = emptyList()
+    val hawkerSales: List<HawkerSales>? = emptyList(),
 )
 
