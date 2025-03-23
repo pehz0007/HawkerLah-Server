@@ -104,6 +104,25 @@ class HawkerOwnerController(
         }
     }
 
+    data class SetClearanceParams(
+        val dishId: String,
+        val clearance: Boolean
+    )
+
+    @PutMapping("/set-clearance")
+    suspend fun setClearance(@RequestBody updatedDish: SetClearanceParams): ResponseEntity<String> {
+        return try {
+            val dishID = Uuid.parse(updatedDish.dishId)
+            hawkerCentreService.setClearance(
+                dishID, updatedDish.clearance
+            )
+            ResponseEntity.ok("Clearance status successfully updated")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error changing clearance status ${e.message}")
+        }
+    }
+
 
     @GetMapping("/order-tracking")
     suspend fun getOrderTracking(authentication: Authentication): ResponseEntity<String> {
@@ -114,7 +133,7 @@ class HawkerOwnerController(
         menuItems.filter { it.hawkerSales!!.isEmpty() }.forEach {
             hawkerCentreService.createHawkerSales(it.id, today)
         }
-        //Create missing order tracking for today
+        //Create missing order tracking for today`
         menuItems = hawkerCentreService.retrieveHawkerStallDishesWithHawkerSales(hawkerStall.id, today)
         return SuccessResult(OrderTracking(
             menuItems,

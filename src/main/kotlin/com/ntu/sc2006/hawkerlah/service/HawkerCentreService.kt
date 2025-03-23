@@ -171,7 +171,31 @@ class HawkerCentreService(
 
     }
 
-    suspend fun createHawkerSales(dishId: SUUID, salesDate: LocalDate) {
+    suspend fun setClearance(
+        dishId: SUUID,
+        chgedStatus: Boolean) {
+
+        try {
+            val client = supabaseBean.supabaseClient()
+            val response = client
+                .from("stall_dishes")
+                .update(
+                    mapOf("clearance" to chgedStatus)
+                ) {
+                    filter {
+                        eq("id", dishId)
+                    }
+                }
+
+            println("Updated Clearance Status: $response")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("Error updating dish: ${e.message}")
+        }
+    }
+
+
+            suspend fun createHawkerSales(dishId: SUUID, salesDate: LocalDate) {
         val client = supabaseBean.supabaseClient()
         client.from("hawker_sales").insert(HawkerSales(
             id = Uuid.random(),

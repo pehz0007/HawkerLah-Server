@@ -25,5 +25,11 @@ data class Food(
     val hawkerStallId: SUUID,
     @SerialName("hawker_sales")
     val hawkerSales: List<HawkerSales>? = emptyList(),
+    // KC ADD
+    @SerialName("cold_food")
+    val coldFood: Boolean,
+    @SerialName("clearance")
+    val clearance: Boolean
+
 )
 
