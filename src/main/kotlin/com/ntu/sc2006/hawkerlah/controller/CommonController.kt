@@ -26,7 +26,10 @@ class CommonController(
     }
 
     @PostMapping("/profile-image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    suspend fun updateProfileImage(@RequestParam("file") file: MultipartFile, authentication: Authentication): ResponseEntity<String> {
+    suspend fun updateProfileImage(
+        @RequestParam("file") file: MultipartFile,
+        authentication: Authentication
+    ): ResponseEntity<String> {
         return try {
             val imageBytes = file.bytes
             val userId = authentication.name

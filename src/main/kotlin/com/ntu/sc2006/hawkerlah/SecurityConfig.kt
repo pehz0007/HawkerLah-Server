@@ -14,8 +14,7 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .requiresChannel{
-                    channel ->
+            .requiresChannel { channel ->
                 channel.anyRequest().requiresSecure()
             }
             .csrf { it.disable() }

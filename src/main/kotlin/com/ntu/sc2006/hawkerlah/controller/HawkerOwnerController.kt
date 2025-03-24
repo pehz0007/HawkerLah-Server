@@ -135,46 +135,58 @@ class HawkerOwnerController(
         }
         //Create missing order tracking for today`
         menuItems = hawkerCentreService.retrieveHawkerStallDishesWithHawkerSales(hawkerStall.id, today)
-        return SuccessResult(OrderTracking(
-            menuItems,
-            today,
-        )).toResponseEntity()
+        return SuccessResult(
+            OrderTracking(
+                menuItems,
+                today,
+            )
+        ).toResponseEntity()
     }
 
     @GetMapping("/order-tracking-increment")
-    suspend fun incrementOrderTracking(authentication: Authentication, @RequestParam dishId: String): ResponseEntity<String> {
+    suspend fun incrementOrderTracking(
+        authentication: Authentication,
+        @RequestParam dishId: String
+    ): ResponseEntity<String> {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         val userId = Uuid.parse(authentication.name)
         val dishId = Uuid.parse(dishId)
         val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
         val dish = hawkerCentreService.getDishHawkerSales(dishId, hawkerStall.id, today)
-        return if(dish != null) {
+        return if (dish != null) {
             hawkerCentreService.updateHawkerSalesQuantity(dish.id, today, dish.hawkerSales!!.first().quantity + 1)
             val updatedDish = hawkerCentreService.getDishHawkerSales(dishId, hawkerStall.id, today)
             SuccessResult(updatedDish).toResponseEntity()
-        }else {
+        } else {
             ErrorResult<String>("Order Tracking does not exist!").toResponseEntity()
         }
     }
 
     @GetMapping("/order-tracking-decrement")
-    suspend fun decrementOrderTracking(authentication: Authentication, @RequestParam dishId: String): ResponseEntity<String> {
+    suspend fun decrementOrderTracking(
+        authentication: Authentication,
+        @RequestParam dishId: String
+    ): ResponseEntity<String> {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         val userId = Uuid.parse(authentication.name)
         val dishId = Uuid.parse(dishId)
         val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
         val dish = hawkerCentreService.getDishHawkerSales(dishId, hawkerStall.id, today)
-        return if(dish != null) {
+        return if (dish != null) {
             hawkerCentreService.updateHawkerSalesQuantity(dish.id, today, dish.hawkerSales!!.first().quantity - 1)
             val updatedDish = hawkerCentreService.getDishHawkerSales(dishId, hawkerStall.id, today)
             SuccessResult(updatedDish).toResponseEntity()
-        }else {
+        } else {
             ErrorResult<String>("Order Tracking does not exist!").toResponseEntity()
         }
     }
 
     @GetMapping("/past-sales")
-    suspend fun getPastSales(authentication: Authentication, @RequestParam("startDate") startDateStr: String, @RequestParam("endDate") endDateStr: String): ResponseEntity<String> {
+    suspend fun getPastSales(
+        authentication: Authentication,
+        @RequestParam("startDate") startDateStr: String,
+        @RequestParam("endDate") endDateStr: String
+    ): ResponseEntity<String> {
         val userId = Uuid.parse(authentication.name)
         val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
         val startDate = LocalDate.parse(startDateStr)

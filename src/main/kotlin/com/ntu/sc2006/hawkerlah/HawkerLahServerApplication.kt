@@ -10,5 +10,5 @@ class HawkerLahServerApplication
 
 
 fun main(args: Array<String>) {
-	runApplication<HawkerLahServerApplication>(*args)
+    runApplication<HawkerLahServerApplication>(*args)
 }

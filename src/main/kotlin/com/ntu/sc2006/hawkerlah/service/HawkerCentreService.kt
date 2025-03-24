@@ -23,7 +23,7 @@ class HawkerCentreService(
 
     suspend fun retrieveHawkerStall(userId: SUUID): HawkerStall {
         val client = supabaseBean.supabaseClient()
-        return client.from("hawker_stall").select() {
+        return client.from("hawker_stall").select {
             filter {
                 eq("id", userId)
             }
@@ -37,7 +37,7 @@ class HawkerCentreService(
 
     suspend fun retrieveSpecificHawkerStallDish(dishID: SUUID): Food {
         val client = supabaseBean.supabaseClient()
-        return client.from("stall_dishes").select() {
+        return client.from("stall_dishes").select {
             filter {
                 eq("id", dishID)
             }
@@ -47,7 +47,7 @@ class HawkerCentreService(
     //kcADD
     suspend fun retrieveHawkerStallDishes(hawkerId: SUUID): List<Food> {
         val client = supabaseBean.supabaseClient()
-        return client.from("stall_dishes").select() {
+        return client.from("stall_dishes").select {
             filter {
                 eq("hawker_id", hawkerId)
             }
@@ -57,15 +57,17 @@ class HawkerCentreService(
     suspend fun retrieveAllHawkerCentreFoodItems(hawkerCentreId: String): List<Food> {
         val client = supabaseBean.supabaseClient()
         return try {
-            client.from("hawker_stall").select(Columns.raw(
-                """
+            client.from("hawker_stall").select(
+                Columns.raw(
+                    """
             *,
             stall_dishes(
                 id, dish_name, description, price, clearance_price, image_url, hawker_id, 
                 cold_food, clearance
             )
             """
-            )) {
+                )
+            ) {
                 filter {
                     eq("hawker_centre_id", hawkerCentreId)
                 }
@@ -81,12 +83,14 @@ class HawkerCentreService(
     suspend fun retrieveHawkerStallDishesWithHawkerSales(hawkerId: SUUID, saleDate: LocalDate): List<Food> {
         val client = supabaseBean.supabaseClient()
         return try {
-            client.from("stall_dishes").select(Columns.raw(
-                """
+            client.from("stall_dishes").select(
+                Columns.raw(
+                    """
                 *,
                 hawker_sales(*)
             """
-            )) {
+                )
+            ) {
                 filter {
                     eq("hawker_id", hawkerId)
                     eq("hawker_sales.sales_date", saleDate.toString())
@@ -145,7 +149,8 @@ class HawkerCentreService(
         dishName: String,
         description: String,
         price: Double,
-        clearancePrice: Double) {
+        clearancePrice: Double
+    ) {
 
         try {
             val client = supabaseBean.supabaseClient()
@@ -173,7 +178,8 @@ class HawkerCentreService(
 
     suspend fun setClearance(
         dishId: SUUID,
-        chgedStatus: Boolean) {
+        chgedStatus: Boolean
+    ) {
 
         try {
             val client = supabaseBean.supabaseClient()
@@ -195,14 +201,16 @@ class HawkerCentreService(
     }
 
 
-            suspend fun createHawkerSales(dishId: SUUID, salesDate: LocalDate) {
+    suspend fun createHawkerSales(dishId: SUUID, salesDate: LocalDate) {
         val client = supabaseBean.supabaseClient()
-        client.from("hawker_sales").insert(HawkerSales(
-            id = Uuid.random(),
-            quantity = 0,
-            salesDate = salesDate,
-            stallDishId = dishId,
-        ))
+        client.from("hawker_sales").insert(
+            HawkerSales(
+                id = Uuid.random(),
+                quantity = 0,
+                salesDate = salesDate,
+                stallDishId = dishId,
+            )
+        )
     }
 
     suspend fun getDishHawkerSales(dishId: SUUID, hawkerId: SUUID, salesDate: LocalDate): Food? {
@@ -243,10 +251,12 @@ class HawkerCentreService(
     suspend fun getPastSales(hawkerId: SUUID, startDate: LocalDate, endDate: LocalDate): List<HawkerSales> {
         val client = supabaseBean.supabaseClient()
         return client.from("hawker_sales").select(
-            Columns.raw("""
+            Columns.raw(
+                """
                 stall_dishes(*),
                 *
-            """.trimIndent())
+            """.trimIndent()
+            )
         ) {
             filter {
                 eq("stall_dishes.hawker_id", hawkerId)

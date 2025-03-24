@@ -1,7 +1,6 @@
 package com.ntu.sc2006.hawkerlah.service
 
 import com.ntu.sc2006.hawkerlah.controller.SupabaseBean
-import com.ntu.sc2006.hawkerlah.model.HawkerCentre
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.storage
 import org.springframework.stereotype.Service
@@ -21,7 +20,7 @@ class CommonService(
             client.storage.from(bucketName).upload(
                 path = filePath,
                 data = imageBytes,
-            ){
+            ) {
                 upsert = true
             }
 
@@ -39,14 +38,12 @@ class CommonService(
         val client = supabaseBean.supabaseClient()
         client
             .from("profiles")
-            .update(mapOf("profile_image_url" to url)){
+            .update(mapOf("profile_image_url" to url)) {
                 filter {
                     eq("id", userId)
                 }
             }
     }
-
-
 
 
 }

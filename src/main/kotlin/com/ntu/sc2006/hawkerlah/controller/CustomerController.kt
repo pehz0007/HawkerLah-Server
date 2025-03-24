@@ -2,8 +2,8 @@ package com.ntu.sc2006.hawkerlah.controller
 
 import com.ntu.sc2006.hawkerlah.service.CarparkService
 import com.ntu.sc2006.hawkerlah.service.HawkerCentreService
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping

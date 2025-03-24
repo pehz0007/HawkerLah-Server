@@ -1,4 +1,4 @@
-package com.ntu.sc2006.hawkerlah.utils;
+package com.ntu.sc2006.hawkerlah.utils
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

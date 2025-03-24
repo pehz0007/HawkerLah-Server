@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HawkerCentre(
-    val id:SUUID,
+    val id: SUUID,
     val name: String,
     @SerialName("image_url")
     val imageUrl: String,

@@ -1,8 +1,6 @@
 package com.ntu.sc2006.hawkerlah.service
 
-import com.ntu.sc2006.hawkerlah.controller.SupabaseBean
 import com.ntu.sc2006.hawkerlah.model.*
-import io.github.jan.supabase.postgrest.from
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -11,11 +9,12 @@ import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 
 @Service
-class CarparkService (val httpClient: HttpClient) {
+class CarparkService(val httpClient: HttpClient) {
 
     suspend fun fetchCarparkLocations(): List<CarparkRecord> {
         return try {
-            val response: HttpResponse = httpClient.get("https://data.gov.sg/api/action/datastore_search?resource_id=d_23f946fa557947f93a8043bbef41dd09")
+            val response: HttpResponse =
+                httpClient.get("https://data.gov.sg/api/action/datastore_search?resource_id=d_23f946fa557947f93a8043bbef41dd09")
             val jsonString = response.body<String>()
             Json { ignoreUnknownKeys = true }.decodeFromString<CarparkResponse>(jsonString).result.records
         } catch (e: Exception) {
@@ -28,7 +27,8 @@ class CarparkService (val httpClient: HttpClient) {
         return try {
             val response: HttpResponse = httpClient.get("https://api.data.gov.sg/v1/transport/carpark-availability")
             val jsonString = response.body<String>()
-            val availabilityResponse = Json { ignoreUnknownKeys = true }.decodeFromString<AvailabilityResponse>(jsonString)
+            val availabilityResponse =
+                Json { ignoreUnknownKeys = true }.decodeFromString<AvailabilityResponse>(jsonString)
             println("Fetched Availability Response: $availabilityResponse")
             availabilityResponse.items.firstOrNull()?.carpark_data ?: emptyList()
         } catch (e: Exception) {
