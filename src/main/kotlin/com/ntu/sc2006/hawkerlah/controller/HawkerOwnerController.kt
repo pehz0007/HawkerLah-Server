@@ -30,16 +30,14 @@ class HawkerOwnerController(
     suspend fun getHawkerStall(authentication: Authentication): ResponseEntity<String> {
         val userId = Uuid.parse(authentication.name)
         val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
-        val responseJson = Json.encodeToString(hawkerStall)
-        return ResponseEntity.ok(responseJson)
+        return SuccessResult(hawkerStall).toResponseEntity()
     }
 
     @GetMapping("/hawker-dish")
     suspend fun getDishDetails(@RequestParam dishId: String): ResponseEntity<String> {
         val dishID = Uuid.parse(dishId)
         val dishDetails = hawkerCentreService.retrieveSpecificHawkerStallDish(dishID)
-        val responseJson = Json.encodeToString(dishDetails)
-        return ResponseEntity.ok(responseJson)
+        return SuccessResult(dishDetails).toResponseEntity()
     }
 
     //KCadd
@@ -48,8 +46,7 @@ class HawkerOwnerController(
         val userId = Uuid.parse(authentication.name)
         val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
         val menuItems = hawkerCentreService.retrieveHawkerStallDishes(hawkerStall.id)
-        val responseJson = Json.encodeToString(menuItems)
-        return ResponseEntity.ok(responseJson)
+        return SuccessResult(menuItems).toResponseEntity()
     }
 
     @PostMapping("/hawker-dish-add", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
@@ -74,11 +71,9 @@ class HawkerOwnerController(
                 imgBytes
             )
 
-            ResponseEntity.ok("Dish added successfully")
-
+            SuccessResult("Dish added successfully").toResponseEntity()
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Failed to add dish: ${e.message}")
+            ErrorResult<String>("Failed to add dish: ${e.message}").toResponseEntity()
         }
     }
 
@@ -97,10 +92,10 @@ class HawkerOwnerController(
             hawkerCentreService.updateDishDetails(
                 dishId, updatedDish.dishName, updatedDish.description, updatedDish.price, updatedDish.clearancePrice
             )
-            ResponseEntity.ok("Dish updated successfully")
+            SuccessResult("Dish updated successfully").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating dish ${e.message}")
+            ErrorResult<String>("Error updating dish ${e.message}").toResponseEntity()
         }
     }
 
@@ -116,10 +111,10 @@ class HawkerOwnerController(
             hawkerCentreService.setClearance(
                 dishID, updatedDish.clearance
             )
-            ResponseEntity.ok("Clearance status successfully updated")
+            SuccessResult("Clearance status successfully updated").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error changing clearance status ${e.message}")
+            ErrorResult<String>("Error changing clearance status ${e.message}").toResponseEntity()
         }
     }
 
