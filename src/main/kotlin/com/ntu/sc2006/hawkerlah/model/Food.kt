@@ -19,6 +19,10 @@ data class Food(
 //    val status: FoodStatus,
     @SerialName("hawker_id")
     val hawkerStallId: SUUID,
+    @SerialName("cold_food")
+    val coldFood: Boolean,
+    @SerialName("clearance")
+    val clearance: Boolean,
     @SerialName("hawker_sales")
     val hawkerSales: List<HawkerSales>? = emptyList(),
     // KC ADD

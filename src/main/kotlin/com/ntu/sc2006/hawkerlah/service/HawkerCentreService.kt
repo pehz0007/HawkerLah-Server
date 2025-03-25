@@ -13,6 +13,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.springframework.stereotype.Service
+import java.util.stream.DoubleStream.DoubleMapMultiConsumer
 import kotlin.random.Random
 import kotlin.uuid.Uuid
 
@@ -106,6 +107,7 @@ class HawkerCentreService(
         hawkerId: String,
         dishName: String,
         description: String,
+        coldFoodStatus: Boolean,
         price: Double,
         clearancePrice: Double,
         imgBytes: ByteArray
@@ -149,8 +151,8 @@ class HawkerCentreService(
         dishName: String,
         description: String,
         price: Double,
-        clearancePrice: Double
-    ) {
+        clearancePrice: Double,
+        coldFoodStatus: Boolean) {
 
         try {
             val client = supabaseBean.supabaseClient()
@@ -161,6 +163,7 @@ class HawkerCentreService(
                         put("description", description)
                         put("price", price)
                         put("clearance_price", clearancePrice)
+                        put("cold_food", coldFoodStatus)
                     }
                 ) {
                     filter {
