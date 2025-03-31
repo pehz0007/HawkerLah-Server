@@ -104,6 +104,24 @@ class HawkerOwnerController(
         }
     }
 
+    @PutMapping("/hawker-dish-updateImg")
+    suspend fun updateImage(@RequestParam("dish_id") dishId: String,
+                            @RequestParam("file") file: MultipartFile,
+                            authentication: Authentication): ResponseEntity<String> {
+        return try {
+            val hawkerId = authentication.name
+            val imgBytes = file.bytes
+            hawkerCentreService.updateImage(
+                dishId, imgBytes, hawkerId
+            )
+
+            SuccessResult("Dish updated successfully").toResponseEntity()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ErrorResult<String>("Error updating dish ${e.message}").toResponseEntity()
+        }
+    }
+
     data class SetClearanceParams(
         val dishId: String,
         val clearance: Boolean

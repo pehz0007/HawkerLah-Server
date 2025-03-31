@@ -9,9 +9,9 @@ import com.ntu.sc2006.hawkerlah.utils.SUUID
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.storage.storage
+import io.github.jan.supabase.storage.BucketApi
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
+import kotlinx.serialization.json.*
 import org.springframework.stereotype.Service
 import java.util.stream.DoubleStream.DoubleMapMultiConsumer
 import kotlin.random.Random
@@ -132,6 +132,7 @@ class HawkerCentreService(
                 .insert(buildJsonObject {
                     put("dish_name", dishName)
                     put("description", description)
+                    put("cold_food", coldFoodStatus)
                     put("price", price)
                     put("clearance_price", clearancePrice)
                     put("hawker_id", hawkerId)
@@ -177,6 +178,64 @@ class HawkerCentreService(
             println("Error updating dish: ${e.message}")
         }
 
+    }
+
+    suspend fun updateImage(
+        dishId: String,
+        newImage: ByteArray,
+        hawkerId: String) {
+        val client = supabaseBean.supabaseClient()
+        val bucketName = "dish-photos"
+
+        try {
+            val response = client.from("stall_dishes").select(
+                Columns.raw("image_url")
+            ) {
+                filter {
+                    eq("id", dishId)
+                }
+            }.decodeSingle<JsonObject>()
+
+            val existingImg = response["image_url"]?.jsonPrimitive?.contentOrNull
+
+            val prevFilePath = existingImg
+                ?.substringAfter("public/")
+                ?.substringAfter("$bucketName/")
+
+            val bucket = client.storage.from(bucketName)
+            if (!prevFilePath.isNullOrBlank()) {
+                bucket.delete(listOf(prevFilePath))
+                println("Deleted old image: $prevFilePath")
+            }
+
+            val randomNo = Random.nextInt(1, 99)
+            val newFilePath = "users/${hawkerId}_${randomNo}.jpg"
+
+            client.storage.from(bucketName).upload(
+                path = newFilePath,
+                data = newImage
+            ) {
+                upsert = true
+            }
+
+            val imageUrl = client.storage.from(bucketName).publicUrl(newFilePath)
+            println("New image uploaded: $imageUrl")
+
+            client.from("stall_dishes").update(
+                buildJsonObject {
+                    put("image_url", imageUrl)
+                }
+            ) {
+                filter {
+                    eq("id", dishId)
+                }
+            }
+
+            println("image is updated in supabase")
+        } catch (e: Exception) {
+            println("Error updating image: ${e.message}")
+            throw e
+        }
     }
 
     suspend fun setClearance(
