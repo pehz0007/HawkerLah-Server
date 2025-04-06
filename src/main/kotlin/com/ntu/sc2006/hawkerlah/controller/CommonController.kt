@@ -32,7 +32,7 @@ class CommonController(
             commonService.updateProfileImage(userId, imageBytes, userId)
             SuccessResult("Profile image updated successfully").toResponseEntity()
         } catch (e: Exception) {
-            ErrorResult<String>("Failed to update profile image: ${e.message}").toResponseEntity()
+            GenericErrorResult("Failed to update profile image: ${e.message}").toResponseEntity()
         }
     }
 }

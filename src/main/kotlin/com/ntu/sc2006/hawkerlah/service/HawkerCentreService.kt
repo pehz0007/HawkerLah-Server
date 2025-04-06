@@ -35,11 +35,12 @@ class HawkerCentreService(
         return client.from("hawker_centre").select().decodeList<HawkerCentre>()
     }
 
-    suspend fun retrieveSpecificHawkerStallDish(dishID: SUUID): Food {
+    suspend fun retrieveSpecificHawkerStallDish(dishID: SUUID, hawkerStallId: SUUID): Food {
         val client = supabaseBean.supabaseClient()
         return client.from("stall_dishes").select {
             filter {
                 eq("id", dishID)
+                eq("hawker_id", hawkerStallId)
             }
         }.decodeSingle<Food>()
     }

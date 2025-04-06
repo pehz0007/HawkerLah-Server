@@ -16,12 +16,14 @@ data class Food(
     val price: Double,
     @SerialName("clearance_price")
     val clearancePrice: Double,
-//    val status: FoodStatus,
     @SerialName("hawker_id")
     val hawkerStallId: SUUID,
+    @SerialName("cold_food")
+    val coldFood: Boolean = false,
+    @SerialName("clearance")
+    val clearance: Boolean = false,
     @SerialName("hawker_sales")
     val hawkerSales: List<HawkerSales>? = emptyList(),
     // KC ADD
 
 )
-

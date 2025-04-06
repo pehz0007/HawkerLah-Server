@@ -16,22 +16,21 @@ enum class ResultStatus {
 }
 
 @Serializable
-sealed class Result<T>(
+sealed class Result<out T>(
     val status: ResultStatus
-) {
-    abstract val response: T?
-}
+)
 
 @Serializable
-data class SuccessResult<T>(
-    override val response: T
+data class SuccessResult<out T>(
+    val response: T
 ) : Result<T>(ResultStatus.Ok)
 
 @Serializable
-data class ErrorResult<T>(
+data class ErrorResult<out T>(
     val message: String,
-    @Transient override val response: T? = null
 ) : Result<T>(ResultStatus.Error)
+
+typealias GenericErrorResult = ErrorResult<Nothing>
 
 inline fun <reified T> T.toResponseEntity(): ResponseEntity<String> {
     val json = Json.encodeToString(this)

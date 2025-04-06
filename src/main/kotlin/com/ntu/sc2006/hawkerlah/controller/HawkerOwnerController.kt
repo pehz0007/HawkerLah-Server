@@ -2,7 +2,7 @@ package com.ntu.sc2006.hawkerlah.controller
 
 import com.ntu.sc2006.hawkerlah.model.OrderTracking
 import com.ntu.sc2006.hawkerlah.model.SalesData
-import com.ntu.sc2006.hawkerlah.service.ErrorResult
+import com.ntu.sc2006.hawkerlah.service.GenericErrorResult
 import com.ntu.sc2006.hawkerlah.service.HawkerCentreService
 import com.ntu.sc2006.hawkerlah.service.SuccessResult
 import com.ntu.sc2006.hawkerlah.service.toResponseEntity
@@ -10,9 +10,6 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -34,10 +31,16 @@ class HawkerOwnerController(
     }
 
     @GetMapping("/hawker-dish")
-    suspend fun getDishDetails(@RequestParam dishId: String): ResponseEntity<String> {
-        val dishID = Uuid.parse(dishId)
-        val dishDetails = hawkerCentreService.retrieveSpecificHawkerStallDish(dishID)
-        return SuccessResult(dishDetails).toResponseEntity()
+    suspend fun getDishDetails(authentication: Authentication, @RequestParam dishId: String): ResponseEntity<String> {
+        try{
+            val userId = Uuid.parse(authentication.name)
+            val hawkerStall = hawkerCentreService.retrieveHawkerStall(userId)
+            val dishID = Uuid.parse(dishId)
+            val dishDetails = hawkerCentreService.retrieveSpecificHawkerStallDish(dishID, hawkerStall.id)
+            return SuccessResult(dishDetails).toResponseEntity()
+        }catch (_: Exception){
+            return GenericErrorResult("Unable to get Hawker's Stall Dish").toResponseEntity()
+        }
     }
 
     //KCadd
@@ -62,6 +65,10 @@ class HawkerOwnerController(
             val imgBytes = file.bytes
             val hawkerId = authentication.name
 
+            if(price <= 0) {
+                GenericErrorResult("Price cannot be negative").toResponseEntity()
+            }
+
             hawkerCentreService.addNewDish(
                 hawkerId,
                 dishName,
@@ -73,7 +80,7 @@ class HawkerOwnerController(
 
             SuccessResult("Dish added successfully").toResponseEntity()
         } catch (e: Exception) {
-            ErrorResult<String>("Failed to add dish: ${e.message}").toResponseEntity()
+            GenericErrorResult("Failed to add dish: ${e.message}").toResponseEntity()
         }
     }
 
@@ -95,7 +102,7 @@ class HawkerOwnerController(
             SuccessResult("Dish updated successfully").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
-            ErrorResult<String>("Error updating dish ${e.message}").toResponseEntity()
+            GenericErrorResult("Error updating dish ${e.message}").toResponseEntity()
         }
     }
 
@@ -114,7 +121,7 @@ class HawkerOwnerController(
             SuccessResult("Clearance status successfully updated").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
-            ErrorResult<String>("Error changing clearance status ${e.message}").toResponseEntity()
+            GenericErrorResult("Error changing clearance status ${e.message}").toResponseEntity()
         }
     }
 
@@ -153,7 +160,7 @@ class HawkerOwnerController(
             val updatedDish = hawkerCentreService.getDishHawkerSales(dishId, hawkerStall.id, today)
             SuccessResult(updatedDish).toResponseEntity()
         } else {
-            ErrorResult<String>("Order Tracking does not exist!").toResponseEntity()
+            GenericErrorResult("Order Tracking does not exist!").toResponseEntity()
         }
     }
 
@@ -172,7 +179,7 @@ class HawkerOwnerController(
             val updatedDish = hawkerCentreService.getDishHawkerSales(dishId, hawkerStall.id, today)
             SuccessResult(updatedDish).toResponseEntity()
         } else {
-            ErrorResult<String>("Order Tracking does not exist!").toResponseEntity()
+            GenericErrorResult("Order Tracking does not exist!").toResponseEntity()
         }
     }
 
