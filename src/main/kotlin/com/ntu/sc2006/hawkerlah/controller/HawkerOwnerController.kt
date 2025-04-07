@@ -66,8 +66,25 @@ class HawkerOwnerController(
             val imgBytes = file.bytes
             val hawkerId = authentication.name
 
-            if(price <= 0) {
-                GenericErrorResult("Price cannot be negative").toResponseEntity()
+            if (dishName.isBlank()) {
+                return GenericErrorResult("Dish name cannot be empty/must be filled").toResponseEntity()
+            }
+
+            if (description.isBlank()) {
+                return GenericErrorResult("Description cannot be empty/must be filled").toResponseEntity()
+            }
+
+            if (price <= 0) {
+                return GenericErrorResult("Price must be greater than 0/Cannot be negative").toResponseEntity()
+            }
+
+            if (clearancePrice <= 0) {
+                return GenericErrorResult("Clearance price must be greater than 0/Cannot be negative")
+                    .toResponseEntity()
+            }
+
+            if (file.isEmpty) {
+                return GenericErrorResult("An image file is needed").toResponseEntity()
             }
 
             hawkerCentreService.addNewDish(
@@ -98,6 +115,23 @@ class HawkerOwnerController(
     @PutMapping("/hawker-dish-update")
     suspend fun updateDishDetails(@RequestBody updatedDish: UpdateDishRequest): ResponseEntity<String> {
         return try {
+            if (updatedDish.dishName.isBlank()) {
+                return GenericErrorResult("Dish name cannot be empty/must be filled").toResponseEntity()
+            }
+
+            if (updatedDish.description.isBlank()) {
+                return GenericErrorResult("Description cannot be empty/must be filled").toResponseEntity()
+            }
+
+            if (updatedDish.price <= 0) {
+                return GenericErrorResult("Price must be greater than 0/Cannot be negative").toResponseEntity()
+            }
+
+            if (updatedDish.clearancePrice <= 0) {
+                return GenericErrorResult("Clearance price must be greater than 0/Cannot be negative")
+                    .toResponseEntity()
+            }
+
             val dishId = Uuid.parse(updatedDish.dishId)
             hawkerCentreService.updateDishDetails(
                 dishId, updatedDish.dishName, updatedDish.description, updatedDish.price, updatedDish.clearancePrice,
@@ -106,7 +140,7 @@ class HawkerOwnerController(
             SuccessResult("Dish updated successfully").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
-            GenericErrorResult("Error updating dish ${e.message}").toResponseEntity()
+            GenericErrorResult("Error updating dish").toResponseEntity()
         }
     }
 
@@ -121,10 +155,10 @@ class HawkerOwnerController(
                 dishId, imgBytes, hawkerId
             )
 
-            SuccessResult("Dish updated successfully").toResponseEntity()
+            SuccessResult("Dish image updated successfully").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
-            GenericErrorResult("Error updating dish ${e.message}").toResponseEntity()
+            GenericErrorResult("Error updating dish image ${e.message}").toResponseEntity()
         }
     }
 
