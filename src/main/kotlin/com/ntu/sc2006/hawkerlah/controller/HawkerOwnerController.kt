@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.awt.print.Book
 import kotlin.uuid.Uuid
 
 @RestController
@@ -57,6 +58,7 @@ class HawkerOwnerController(
         @RequestParam("file") file: MultipartFile, // Receives image
         @RequestParam("dishName") dishName: String,
         @RequestParam("description") description: String,
+        @RequestParam("coldFoodStatus") coldFoodStatus: Boolean,
         @RequestParam("price") price: Double,
         @RequestParam("clearancePrice") clearancePrice: Double,
         authentication: Authentication
@@ -73,6 +75,7 @@ class HawkerOwnerController(
                 hawkerId,
                 dishName,
                 description,
+                coldFoodStatus,
                 price,
                 clearancePrice,
                 imgBytes
@@ -89,7 +92,8 @@ class HawkerOwnerController(
         val dishName: String,
         val description: String,
         val price: Double,
-        val clearancePrice: Double
+        val clearancePrice: Double,
+        val coldFoodStatus: Boolean
     )
 
     @PutMapping("/hawker-dish-update")
@@ -97,12 +101,31 @@ class HawkerOwnerController(
         return try {
             val dishId = Uuid.parse(updatedDish.dishId)
             hawkerCentreService.updateDishDetails(
-                dishId, updatedDish.dishName, updatedDish.description, updatedDish.price, updatedDish.clearancePrice
+                dishId, updatedDish.dishName, updatedDish.description, updatedDish.price, updatedDish.clearancePrice,
+                updatedDish.coldFoodStatus
             )
             SuccessResult("Dish updated successfully").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
             GenericErrorResult("Error updating dish ${e.message}").toResponseEntity()
+        }
+    }
+
+    @PutMapping("/hawker-dish-updateImg")
+    suspend fun updateImage(@RequestParam("dish_id") dishId: String,
+                            @RequestParam("file") file: MultipartFile,
+                            authentication: Authentication): ResponseEntity<String> {
+        return try {
+            val hawkerId = authentication.name
+            val imgBytes = file.bytes
+            hawkerCentreService.updateImage(
+                dishId, imgBytes, hawkerId
+            )
+
+            SuccessResult("Dish updated successfully").toResponseEntity()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ErrorResult<String>("Error updating dish ${e.message}").toResponseEntity()
         }
     }
 
