@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.awt.print.Book
 import kotlin.uuid.Uuid
 
 @RestController
@@ -125,7 +124,7 @@ class HawkerOwnerController(
             SuccessResult("Dish updated successfully").toResponseEntity()
         } catch (e: Exception) {
             e.printStackTrace()
-            ErrorResult<String>("Error updating dish ${e.message}").toResponseEntity()
+            GenericErrorResult("Error updating dish ${e.message}").toResponseEntity()
         }
     }
 
