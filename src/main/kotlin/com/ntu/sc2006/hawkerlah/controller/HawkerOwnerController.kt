@@ -83,6 +83,11 @@ class HawkerOwnerController(
                     .toResponseEntity()
             }
 
+            if (price < clearancePrice) {
+                return GenericErrorResult("Price must be greater than Clearance Price")
+                    .toResponseEntity()
+            }
+
             if (file.isEmpty) {
                 return GenericErrorResult("An image file is needed").toResponseEntity()
             }
@@ -129,6 +134,11 @@ class HawkerOwnerController(
 
             if (updatedDish.clearancePrice <= 0) {
                 return GenericErrorResult("Clearance price must be greater than 0/Cannot be negative")
+                    .toResponseEntity()
+            }
+
+            if (updatedDish.price < updatedDish.clearancePrice) {
+                return GenericErrorResult("Price must be greater than Clearance Price")
                     .toResponseEntity()
             }
 
